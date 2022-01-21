@@ -33,16 +33,16 @@ class Workout {
                                          RUNNING
 ==========================================================================================*/
 class Running extends Workout {
-  #pace;
   type = "running";
   constructor(distance, duration, coords, cadence) {
     super(distance, duration, coords);
     this.cadence = cadence;
+    this.pace = this.#calcPace()
     this._setDescription();
   }
 
   #calcPace() {
-    this.#pace = this.duration / this.distance;
+    return (this.duration / this.distance).toFixed(1);
   }
 }
 
@@ -55,11 +55,12 @@ class Cycling extends Workout {
   constructor(distance, duration, coords, elevationGain) {
     super(distance, duration, coords);
     this.elevationGain = elevationGain;
+    this.speed = this.#calcSpeed()
     this._setDescription();
   }
 
-  calcSpeed() {
-    this.#speed = this.duration.distance;
+  #calcSpeed() {
+    return (this.duration/this.distance).toFixed(1);
   }
 }
 
@@ -156,6 +157,8 @@ class App {
       workout = new Cycling(duration, duration, [lat, lng], elevationGain);
     }
 
+    this.#renderWorkout(workout)
+
     L.marker([lat, lng])
       .addTo(this.#map)
       .bindPopup(
@@ -175,6 +178,36 @@ class App {
       inputCadence.value =
       inputElevation.value =
         "";
+  }
+  #renderWorkout(workout){
+    const html = `
+    <li class="workout workout--running" data-id="1234567890">
+          <h2 class="workout__title">Running on April 14</h2>
+          <div class="workout__details">
+            <span class="workout__icon">${workout.type==='running'?'🏃‍♂':'🚴️'}</span>
+            <span class="workout__value">${workout.distance}</span>
+            <span class="workout__unit">km</span>
+          </div>
+          <div class="workout__details">
+            <span class="workout__icon">⏱</span>
+            <span class="workout__value">${workout.duration}</span>
+            <span class="workout__unit">min</span>
+          </div>
+          <div class="workout__details">
+            <span class="workout__icon">⚡️</span>
+            <span class="workout__value">${workout.type==='running'?workout.pace:workout.speed}</span>
+            <span class="workout__unit">${workout.type==='running'?'min/km':'km/h'}</span>
+          </div>
+          <div class="workout__details">
+            <span class="workout__icon">${workout.type==='running'?'🦶🏼':'⛰'}</span>
+            <span class="workout__value">${workout.type==='running'?workout.cadence:workout.elevationGain}</span>
+            <span class="workout__unit">${workout.type==='running'?'spm':'m'}</span>
+          </div>
+        </li>`
+
+
+
+    containerWorkouts.insertAdjacentHTML('beforeend',html)
   }
 }
 
